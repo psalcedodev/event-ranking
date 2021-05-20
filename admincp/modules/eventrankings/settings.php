@@ -30,6 +30,8 @@ function saveChanges()
     if (!in_array($_POST['setting_5'], array(1, 0))) throw new Exception('Submitted setting is not valid (show_class)');
     $xml->show_class = $_POST['setting_5'];
 
+
+
     if (!Validator::UnsignedNumber($_POST['setting_6'])) throw new Exception('Submitted setting is not valid (live_ranking)');
     if (!in_array($_POST['setting_6'], array(1, 0))) throw new Exception('Submitted setting is not valid (live_ranking)');
     $xml->live_ranking = $_POST['setting_6'];
@@ -38,6 +40,16 @@ function saveChanges()
 
     $save = @$xml->asXML($xmlPath);
     if (!$save) throw new Exception('There has been an error while saving changes.');
+}
+
+//Event Ranking DB Reset
+if (check_value($_REQUEST['resetdb'])) {
+    $action = resetDB($_REQUEST['resetdb']);
+    if ($action) {
+        message('success', $_REQUEST['resetdb'] . " Reset successfull");
+    } else {
+        message('error', 'There was an error reseting the database.');
+    }
 }
 
 if (check_value($_POST['submit_changes'])) {
@@ -50,6 +62,13 @@ if (check_value($_POST['submit_changes'])) {
     }
 }
 
+function resetDB($dbname)
+{
+    $db = config('SQL_USE_2_DB', true) ? Connection::Database('Me_MuOnline') : Connection::Database('MuOnline');
+    $result = $db->query("DELETE FROM $dbname");
+    if (!$result) return;
+    return true;
+}
 
 // load configs
 $pluginConfig = simplexml_load_file(__PATH_EVENTRANKINGS_ROOT__ . 'config.xml');
@@ -57,10 +76,6 @@ if (!$pluginConfig) throw new Exception('Error loading config file.');
 ?>
 <h2>Event Rankings Settings</h2>
 
-<h4>Rankings Home</h4>
-<p><?php echo '<a href="' . __PATH_MODULES_RANKINGS__ . 'bloodcastle/" target="_blank">' . __PATH_MODULES_RANKINGS__ . 'bloodcastle/</a>'; ?></p>
-<p><?php echo '<a href="' . __PATH_MODULES_RANKINGS__ . 'devilsquare/" target="_blank">' . __PATH_MODULES_RANKINGS__ . 'devilsquare/</a>'; ?></p>
-<p><?php echo '<a href="' . __PATH_MODULES_RANKINGS__ . 'chaoscastle/" target="_blank">' . __PATH_MODULES_RANKINGS__ . 'chaoscastle/</a>'; ?></p>
 <form action="" method="post">
 
     <table class="table table-striped table-bordered table-hover module_config_tables">
@@ -98,5 +113,42 @@ if (!$pluginConfig) throw new Exception('Error loading config file.');
         <tr>
             <td colspan="2"><input type="submit" name="submit_changes" value="Save Changes" class="btn btn-success" /></td>
         </tr>
+    </table>
+</form>
+
+<hr>
+<h3>Reset Databases</h3>
+<form action="index.php?module=eventrankings&page=settings" method="post">
+    <table class="table table-striped table-bordered table-hover module_config_tables">
+        <tr>
+            <th>Database</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <th>Reset Blood Castle<br /><span>If clicked, all data from Blood Castle Ranking will be deleted.</span></th>
+            <td>
+                <a href="index.php?module=eventrankings&page=settings&resetdb=RankingBloodCastle" class="btn btn-danger">Reset</a>
+                <a href="?module=cachemanager&amp;action=clear&amp;file=rankings_bloodcastle.cache" class="btn btn-danger">clear cache</a>
+            </td>
+        </tr>
+        <!-- index.php?module=modules_manager&config=downloads -->
+        <!-- index.php?module=eventrankings&page=settings&resetdb=RankingBloodCastle -->
+        <!-- index.php?module=modules_manager&config=downloads&deletelink=10 -->
+        <tr>
+            <th>Reset Chaos Castle<br /><span>If clicked, all data from Chaos Castle Ranking will be deleted.</span></th>
+            <td>
+
+                <a href="index.php?module=eventrankings&page=settings&resetdb=RankingChaosCastle" class="btn btn-danger">Reset</a>
+                <a href="?module=cachemanager&amp;action=clear&amp;file=rankings_chaoscastle.cache" class="btn btn-danger">clear cache</a>
+            </td>
+        </tr>
+        <tr>
+            <th>Reset Devil Square<br /><span>If clicked, all data from Devil Square Ranking will be deleted.</span></th>
+            <td>
+                <a href="index.php?module=eventrankings&page=settings&resetdb=RankingDevilSquare" class="btn btn-danger">Reset</a>
+                <a href="?module=cachemanager&amp;action=clear&amp;file=rankings_devilsquare.cache" class="btn btn-danger">clear cache</a>
+            </td>
+        </tr>
+
     </table>
 </form>

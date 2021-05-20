@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Event Rankings
  * https://webenginecms.org/
@@ -11,9 +10,10 @@
  */
 
 try {
-
+	
 	$EventRankings = new \Plugin\EventRankings\EventRankings();
 	$EventRankings->loadModule('bloodcastle');
-} catch (Exception $ex) {
+	
+} catch(Exception $ex) {
 	message('error', $ex->getMessage());
 }
