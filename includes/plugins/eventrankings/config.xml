@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<settings>
+	<results_limit>50</results_limit>
+	<show_level>1</show_level>
+	<show_class>1</show_class>
+	<live_ranking>1</live_ranking>
+	<excluded_players></excluded_players>
+</settings>
